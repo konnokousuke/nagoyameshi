@@ -129,6 +129,14 @@ footer {
      color: #ffa500;
  }
  
+ .custom-alert {
+	background-color: #ef990d8c;
+}
+
+.alert-info {
+    --bs-alert-bg: #ef990d7a;
+}
+ 
 @media screen and (min-width: 1400px) {
 	.nagoyameshi-container {
 		max-width: 1200px;

@@ -20,10 +20,28 @@ VALUES
 
 -- 会員情報テーブル --
 -- テスト用会員データ --
-INSERT IGNORE INTO members (name, furigana, postal_code, address, phone_number, email, password, status)
+INSERT IGNORE INTO members (name, furigana, postal_code, address, phone_number, email, password, role_id, enabled, status)
 VALUES
-('侍太郎', 'サムライタロウ', '123-4567', '名古屋市中区栄1-1-1', '052-123-4567', 'test@example.com', 'password', 'free'),
-('武士花子', 'ブシハナコ', '123-4568', '名古屋市中区栄2-2-2', '052-234-5678', 'bushi@example.com', 'password', 'free');
+('侍太郎', 'サムライタロウ', '123-4567', '名古屋市中区栄1-1-1', '052-123-4567', 'test@example.com', '$2a$08$Lqz/1gfIm4iIYigKR3Dz3elVe5cLUbUwVztsXs2xhILTDwAFAT7SS', '1', '1', 'FREE'),
+('武士花子', 'ブシハナコ', '123-4568', '名古屋市中区栄2-2-2', '052-234-5678', 'bushi@example.com', '$2a$08$c6x3bJZ0awA0/tmEqyGVEu6UurClvH50QPTwkmWGtQa9ETxjHN8SS', '2', '1', 'PAID');
+
+-- ロール情報テーブル --
+INSERT IGNORE INTO roles (name)
+VALUES
+('ROLE_FREE'),
+('ROLE_PAID'),
+('ROLE_ADMIN');
+
+-- 会員ロール情報テーブル --
+INSERT IGNORE INTO member_roles (member_id, role_id)
+VALUES
+((SELECT member_id FROM members WHERE email='test@example.com'), (SELECT role_id FROM roles WHERE name='ROLE_FREE')),
+((SELECT member_id FROM members WHERE email='bushi@example.com'), (SELECT role_id FROM roles WHERE name='ROLE_PAID'));
+
+-- 管理者情報テーブル --
+INSERT IGNORE INTO admins (email, password)
+VALUES
+('admin@example.com', '$2a$08$Zl0MMaNbANtJ31l6dAjr5.DbVmVwk./QU0.xnDai3YN/1oaOfQ3da');
 
 -- 店舗情報テーブル --
 -- カフェの店舗情報

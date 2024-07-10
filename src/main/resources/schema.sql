@@ -1,6 +1,6 @@
 -- 会員情報テーブル
 CREATE TABLE IF NOT EXISTS members (
-    member_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL, -- 名前
     furigana VARCHAR(100) NOT NULL, -- フリガナ
     postal_code VARCHAR(10) NOT NULL, --郵便番号
@@ -8,7 +8,9 @@ CREATE TABLE IF NOT EXISTS members (
     phone_number VARCHAR(20) NOT NULL, -- 電話番号
     email VARCHAR(100) NOT NULL UNIQUE, -- メールアドレスはユニーク
     password VARCHAR(100) NOT NULL, -- パスワード
-    status ENUM('free', 'paid') NOT NULL, -- 会員ステータス(無料か有料か)
+    role_id INT NOT NULL,
+    enabled BOOLEAN NOT NULL, -- ユーザーが有効かどうか
+    status ENUM('FREE', 'PAID') NOT NULL, -- 会員ステータス(無料か有料か)
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -21,6 +23,23 @@ CREATE TABLE IF NOT EXISTS admins (
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+-- ロール情報テーブル
+CREATE TABLE IF NOT EXISTS roles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50) NOT NULL
+);
+
+
+-- 会員ロール情報テーブル（中間テーブル）
+CREATE TABLE IF NOT EXISTS member_roles (
+    member_id INT NOT NULL,
+    role_id INT NOT NULL,
+    FOREIGN KEY (member_id) REFERENCES members(id),
+    FOREIGN KEY (role_id) REFERENCES roles(id),
+    PRIMARY KEY (member_id, role_id)
+);
+
 
 -- カテゴリテーブル
 CREATE TABLE IF NOT EXISTS categories (
@@ -86,7 +105,7 @@ CREATE TABLE IF NOT EXISTS reservations (
     number_of_people INT NOT NULL, -- 予約人数
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (member_id) REFERENCES members(member_id),
+    FOREIGN KEY (member_id) REFERENCES members(id),
     FOREIGN KEY (store_id) REFERENCES stores(store_id)
 );
 
@@ -99,7 +118,7 @@ CREATE TABLE IF NOT EXISTS reviews (
     comment TEXT, -- コメント
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (member_id) REFERENCES members(member_id),
+    FOREIGN KEY (member_id) REFERENCES members(id),
     FOREIGN KEY (store_id) REFERENCES stores(store_id),
     UNIQUE (member_id, store_id) -- 同じ会員が同じ店舗に対して複数のレビューを持たないようにする
 );
@@ -111,7 +130,7 @@ CREATE TABLE IF NOT EXISTS favorites (
     store_id INT NOT NULL, -- 店舗情報ID(外部キー)
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (member_id) REFERENCES members(member_id),
+    FOREIGN KEY (member_id) REFERENCES members(id),
     FOREIGN KEY (store_id) REFERENCES stores(store_id),
     UNIQUE (member_id, store_id) -- 同じ会員が同じ店舗を複数回お気に入りに追加しないようにする
 );

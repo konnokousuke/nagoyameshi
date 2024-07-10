@@ -37,8 +37,8 @@ public class Store {
 	@Column(name = "image_filename")
 	private String imageFilename;
 	
-	@Column(name = "rating")
-	private int rating;
+	@Column(name = "rating", columnDefinition = "INT CHECK (rating BETWEEN 1 AND 5) DEFAULT 1")
+	private Integer rating;
 	
 	@Column(name = "description", nullable = false) // "nullable = false"でNULLを許容しない
 	private String description;
