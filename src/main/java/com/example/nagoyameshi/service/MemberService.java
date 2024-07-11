@@ -35,7 +35,7 @@ public class MemberService {
 		member.setEmail(signupForm.getEmail());
 		member.setPassword(passwordEncoder.encode(signupForm.getPassword()));
 		member.setRole(role);
-		member.setEnabled(true);
+		member.setEnabled(false);
 		
 		return memberRepository.save(member);
 	}
@@ -49,5 +49,12 @@ public class MemberService {
 	// パスワードとパスワード(確認用)の入力値が一致しているか判定する
 	public boolean isSamePassword(String password, String passwordConfirmation) {
 		return password.equals(passwordConfirmation);
+	}
+	
+	// ユーザーを有効にする
+	@Transactional
+	public void enableMember(Member member) {
+		member.setEnabled(true);
+		memberRepository.save(member);
 	}
 }

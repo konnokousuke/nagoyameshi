@@ -10,15 +10,21 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import com.example.nagoyameshi.entity.Member;
+import com.example.nagoyameshi.event.SignupEventPublisher;
 import com.example.nagoyameshi.form.SignupForm;
 import com.example.nagoyameshi.service.MemberService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 @Controller
 public class AuthController {
 	private final MemberService memberService;
+	private final SignupEventPublisher signupEventPublisher;
 	
-	public AuthController(MemberService memberService) {
+	public AuthController(MemberService memberService, SignupEventPublisher signupEventPublisher) {
 		this.memberService = memberService;
+		this.signupEventPublisher = signupEventPublisher;
 	}
 	@GetMapping("/login")
 	public String login() {
@@ -32,7 +38,7 @@ public class AuthController {
 	}
 	
 	@PostMapping("/signup")
-	public String signup(@ModelAttribute @Validated SignupForm signupForm, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+	public String signup(@ModelAttribute @Validated SignupForm signupForm, BindingResult bindingResult, RedirectAttributes redirectAttributes, HttpServletRequest httpServletRequest) {
 		// メールアドレスが登録済みであれば、BindingResultオブジェクトにエラー内容を追加する
 		if (memberService.isEmailRegistered(signupForm.getEmail())) {
 			FieldError fieldError = new FieldError(bindingResult.getObjectName(), "email", "すでに登録済みのメールアドレスです。");
@@ -49,8 +55,10 @@ public class AuthController {
 			return "auth/signup";
 		}
 	
-	memberService.create(signupForm);
-	redirectAttributes.addFlashAttribute("successMessage", "会員登録が完了しました。");
+		Member createdMember = memberService.create(signupForm);
+		String requestUrl = new String(httpServletRequest.getRequestURL());
+		signupEventPublisher.publishSignupEvent(createdMember, requestUrl);
+		redirectAttributes.addFlashAttribute("successMessage", "ご入力いただいたメールアドレスに認証メールを送信しました。メールに記載されているリンクをクリックし、会員登録を完了してください。");
 	
 	return "redirect:/";
 	
