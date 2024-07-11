@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS admins (
 -- ロール情報テーブル
 CREATE TABLE IF NOT EXISTS roles (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(50) NOT NULL
+    name VARCHAR(50) NOT NULL UNIQUE -- ロール名はユニーク
 );
 
 
@@ -47,25 +47,6 @@ CREATE TABLE IF NOT EXISTS categories (
     name VARCHAR(50) NOT NULL UNIQUE, -- カテゴリ名はユニーク
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-);
-
--- 店舗情報テーブル
-CREATE TABLE IF NOT EXISTS stores (
-    store_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY, -- 主キーとしての店舗情報ID
-    category_id INT, -- カテゴリID(外部キー)
-    store_name VARCHAR(50) NOT NULL, -- 店舗名
-    image_filename VARCHAR(255) NOT NULL UNIQUE, -- 画像ファイルはユニーク
-    rating INT CHECK (rating BETWEEN 1 AND 5), -- レビュー(1から5の整数)
-    description TEXT NOT NULL, -- 店舗説明
-    price INT NOT NULL, -- 価格
-    postal_code VARCHAR(20) NOT NULL, -- 郵便番号
-    address VARCHAR(255) NOT NULL, -- 住所
-    phone_number VARCHAR(20) NOT NULL, -- 電話番号
-    opening_hours VARCHAR(50) NOT NULL, -- 営業時間
-    closed_days VARCHAR(50) NOT NULL, -- 定休日
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES categories(category_id) -- 外部キー制約
 );
 
 -- 店舗情報テーブル

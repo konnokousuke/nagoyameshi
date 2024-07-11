@@ -41,6 +41,9 @@
                         <li class="nav-item" sec:authorize="isAnonymous()">
                             <a class="nav-link" th:href="@{/login}">ログイン</a>
                         </li>
+                        <li class="nav-item" sec:authorize="isAnonymous()">
+							<a class="nav-link" th:href="@{/signup}">無料会員登録</a>
+						</li>
                         
                         <!-- 無料会員であれば表示する -->
                         <li class="nav-item dropdown" sec:authorize="hasRole('ROLE_FREE')">
