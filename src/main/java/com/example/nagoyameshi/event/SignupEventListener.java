@@ -34,7 +34,7 @@ public class SignupEventListener {
 		SimpleMailMessage mailMessage = new SimpleMailMessage();
 		mailMessage.setTo(recipientAddress);
 		mailMessage.setSubject(subject);
-		mailMessage.setText(message + "/n" + confirmationUrl);
+		mailMessage.setText(message + "\n" + confirmationUrl);
 		javaMailSender.send(mailMessage);
 	}
 }

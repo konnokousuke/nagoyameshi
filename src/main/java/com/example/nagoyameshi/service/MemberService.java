@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.nagoyameshi.entity.Member;
 import com.example.nagoyameshi.entity.Role;
+import com.example.nagoyameshi.form.MemberEditForm;
 import com.example.nagoyameshi.form.SignupForm;
 import com.example.nagoyameshi.repository.MemberRepository;
 import com.example.nagoyameshi.repository.RoleRepository;
@@ -40,6 +41,22 @@ public class MemberService {
 		return memberRepository.save(member);
 	}
 	
+	@Transactional
+	public void update(MemberEditForm memberEditForm) {
+		// TODO Long.valueOf要らなくする
+		Member member = memberRepository.getReferenceById(Long.valueOf(memberEditForm.getId()));
+		
+		member.setName(memberEditForm.getName());
+		member.setFurigana(memberEditForm.getFurigana());
+		member.setPostalCode(memberEditForm.getPostalCode());
+		member.setAddress(memberEditForm.getAddress());
+		member.setPhoneNumber(memberEditForm.getPhoneNumber());
+		member.setEmail(memberEditForm.getEmail());
+		
+		memberRepository.save(member);
+		
+	}
+	
 	// メールアドレスが登録済みかどうかをチェックする
 	public boolean isEmailRegistered(String email) {
 		Member member = memberRepository.findByEmail(email);
@@ -56,5 +73,12 @@ public class MemberService {
 	public void enableMember(Member member) {
 		member.setEnabled(true);
 		memberRepository.save(member);
+	}
+	
+	// メールアドレスが変更されたかどうかをチェックする
+	public boolean isEmailChanged(MemberEditForm memberEditForm) {
+		// TODO Long.valueOf要らなくする
+		Member currentMember = memberRepository.getReferenceById(Long.valueOf(memberEditForm.getId()));
+		return !memberEditForm.getEmail().equals(currentMember.getEmail());
 	}
 }

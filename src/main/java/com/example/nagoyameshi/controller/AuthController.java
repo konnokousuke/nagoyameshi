@@ -8,12 +8,15 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.nagoyameshi.entity.Member;
+import com.example.nagoyameshi.entity.VerificationToken;
 import com.example.nagoyameshi.event.SignupEventPublisher;
 import com.example.nagoyameshi.form.SignupForm;
 import com.example.nagoyameshi.service.MemberService;
+import com.example.nagoyameshi.service.VerificationTokenService;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -21,10 +24,12 @@ import jakarta.servlet.http.HttpServletRequest;
 public class AuthController {
 	private final MemberService memberService;
 	private final SignupEventPublisher signupEventPublisher;
+	private final VerificationTokenService verificationTokenService;
 	
-	public AuthController(MemberService memberService, SignupEventPublisher signupEventPublisher) {
+	public AuthController(MemberService memberService, SignupEventPublisher signupEventPublisher, VerificationTokenService verificationTokenService) {
 		this.memberService = memberService;
 		this.signupEventPublisher = signupEventPublisher;
+		this.verificationTokenService = verificationTokenService;
 	}
 	@GetMapping("/login")
 	public String login() {
@@ -63,5 +68,30 @@ public class AuthController {
 	return "redirect:/";
 	
 	}
+	
+	@GetMapping("signup/verify")
+	public String verify(@RequestParam(name = "token") String token, Model model) {
+		VerificationToken verificationToken = verificationTokenService.getVerificationToken(token);
+		String key = null;
+		String message = null;
+		
+		if (verificationToken != null) {
+			Member member = verificationToken.getMember();
+			memberService.enableMember(member);
+			//String successMessage = "会員登録が完了しました。";
+			key = "successMessage";
+			message = "会員登録が完了しました。";
+			//model.addAttribute("successMessage", successMessage);
+			
+		} else {
+			//String errorMessage = "トークンが無効です。";
+			key = "errorMessage";
+			message = "トークンが無効です。";
+			//model.addAttribute("errorMessage",errorMessage);
+		}
+		model.addAttribute(key,message);
+		return "auth/verify";
+	}
+	
 	
 }

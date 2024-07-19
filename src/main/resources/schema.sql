@@ -40,7 +40,6 @@ CREATE TABLE IF NOT EXISTS roles (
     name VARCHAR(50) NOT NULL UNIQUE -- ロール名はユニーク
 );
 
-
 -- 会員ロール情報テーブル（中間テーブル）
 CREATE TABLE IF NOT EXISTS member_roles (
     member_id INT NOT NULL,
