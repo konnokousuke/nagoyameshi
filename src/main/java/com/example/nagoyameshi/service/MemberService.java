@@ -42,9 +42,8 @@ public class MemberService {
 	}
 	
 	@Transactional
-	public void update(MemberEditForm memberEditForm) {
-		// TODO Long.valueOf要らなくする
-		Member member = memberRepository.getReferenceById(Long.valueOf(memberEditForm.getId()));
+	public void update(MemberEditForm memberEditForm) {    
+		Member member = memberRepository.getReferenceById(memberEditForm.getId());
 		
 		member.setName(memberEditForm.getName());
 		member.setFurigana(memberEditForm.getFurigana());
@@ -77,8 +76,7 @@ public class MemberService {
 	
 	// メールアドレスが変更されたかどうかをチェックする
 	public boolean isEmailChanged(MemberEditForm memberEditForm) {
-		// TODO Long.valueOf要らなくする
-		Member currentMember = memberRepository.getReferenceById(Long.valueOf(memberEditForm.getId()));
+		Member currentMember = memberRepository.getReferenceById(memberEditForm.getId());
 		return !memberEditForm.getEmail().equals(currentMember.getEmail());
 	}
 }

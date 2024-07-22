@@ -31,8 +31,7 @@ public class MemberController {
 	
 	@GetMapping
 	public String index(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl, Model model) {
-		// TODO Long.valueOf要らなくする
-		Member member = memberRepository.getReferenceById(Long.valueOf(memberDetailsImpl.getMember().getId()));
+		Member member = memberRepository.getReferenceById(memberDetailsImpl.getMember().getId());
 		
 		model.addAttribute("member", member);
 		
@@ -41,7 +40,7 @@ public class MemberController {
 	
 	@GetMapping("/edit")
 	public String edit(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl, Model model) {
-		Member member = memberRepository.getReferenceById(Long.valueOf(memberDetailsImpl.getMember().getId()));
+		Member member = memberRepository.getReferenceById(memberDetailsImpl.getMember().getId());
 		MemberEditForm memberEditForm = new MemberEditForm(member.getId(), member.getName(), member.getFurigana(), member.getPostalCode(), member.getAddress(), member.getPhoneNumber(), member.getEmail());
 		
 		model.addAttribute("memberEditForm", memberEditForm);
