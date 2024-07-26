@@ -25,22 +25,37 @@ public class StoreController {
 	@GetMapping
 	public String index(@RequestParam(name = "keyword", required = false) String keyword,
 			            @RequestParam(name = "price", required = false) Integer price,
+			            @RequestParam(name = "order", required = false) String order,
 			            @PageableDefault(page =0, size = 10, sort = "storeId", direction = Direction.ASC) Pageable pageable,
 			            Model model)
 	{
 		Page<Store> storePage;
 		
 		if (keyword != null && !keyword.isEmpty()) {
-			storePage = storeRepository.findByStoreNameLikeOrDescriptionLike("%" + keyword + "%", "%" + keyword + "%", pageable);
+			if (order != null && order.equals("priceAsc")) {
+				storePage = storeRepository.findByStoreNameLikeOrDescriptionLikeOrderByPriceAsc("%" + keyword + "%", "%" + keyword + "%", pageable);
+			} else {
+				storePage = storeRepository.findByStoreNameLikeOrDescriptionLikeOrderByCreatedAtDesc("%" + keyword + "%", "%" + keyword + "%", pageable);
+			}
+			
 		} else if (price != null) {
-			storePage = storeRepository.findByPriceLessThanEqual(price, pageable);
+			if (order != null && order.equals("priceAsc")) {
+				storePage = storeRepository.findByPriceLessThanEqualOrderByPriceAsc(price, pageable);
+			} else {
+				storePage = storeRepository.findByPriceLessThanEqualOrderByCreatedAtDesc(price, pageable);
+			}
 		} else {
-			storePage = storeRepository.findAll(pageable);
+			if (order != null && order.equals("priceAsc")) {
+				storePage = storeRepository.findAllByOrderByPriceAsc(pageable);
+			} else {
+				storePage = storeRepository.findAllByOrderByCreatedAtDesc(pageable);
+			}
 		}
 		
 		model.addAttribute("storePage", storePage);
 		model.addAttribute("keyword", keyword);
 		model.addAttribute("price", price);
+		model.addAttribute("order", order);
 		
 		return "stores/index";
 	}
