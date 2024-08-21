@@ -346,3 +346,19 @@ VALUES
 (2, 71, 3, '価格は手頃ですが、味は特に印象に残りませんでした。'),
 (2, 72, 5, '豪華なディナーを堪能しました。とても満足です。'),
 (2, 73, 4, 'カジュアルに楽しめる良いお店ですが、サービスの改善が必要です。');
+
+--　予約情報テーブル　--
+--　テストデータ
+INSERT  IGNORE INTO reservations (reservation_id, member_id, store_id, reservation_datetime, number_of_people)
+VALUES
+(1, (SELECT id FROM members WHERE name='武士花子'), 1, '2024-08-20 12:00:00', 2),
+(2, (SELECT id FROM members WHERE name='武士花子'), 2, '2024-08-21 12:00:00', 4),
+(3, (SELECT id FROM members WHERE name='武士花子'), 3, '2024-08-22 12:00:00', 3),
+(4, (SELECT id FROM members WHERE name='武士花子'), 4, '2024-08-23 12:00:00', 2),
+(5, (SELECT id FROM members WHERE name='武士花子'), 5, '2024-08-24 18:00:00', 5),
+(6, (SELECT id FROM members WHERE name='武士花子'), 6, '2024-08-25 18:00:00', 2),
+(7, (SELECT id FROM members WHERE name='武士花子'), 7, '2024-08-26 19:00:00', 6),
+(8, (SELECT id FROM members WHERE name='武士花子'), 8, '2024-08-27 19:00:00', 3),
+(9, (SELECT id FROM members WHERE name='武士花子'), 9, '2024-08-28 20:00:00', 4),
+(10, (SELECT id FROM members WHERE name='武士花子'),10, '2024-08-29 20:00:00', 2),
+(11, (SELECT id FROM members WHERE name='武士花子'),11, '2024-08-30 20:00:00', 1);
