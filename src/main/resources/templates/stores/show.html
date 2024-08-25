@@ -4,8 +4,11 @@
         <div th:replace="~{fragment :: meta}"></div>   
              
         <div th:replace="~{fragment :: styles}"></div>
+        
+        <!-- Flatpickr -->
+         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
           
-        <title>民宿詳細</title>   
+        <title>店舗詳細</title>   
     </head>
     <body>
         <div class="nagoyameshi-wrapper">
@@ -106,7 +109,24 @@
                                                 <button type="submit" class="btn text-white shadow-sm w-100 nagoyameshi-btn" disabled>予約する</button>                                                                                                                
                                             </div>
                                         </div>  
-                                    </div>                                                                                                                     
+                                    </div>
+                                    
+                                    <form th:action="@{/stores/{id}/reserve(id=${store.storeId})}" th:object="${reservationForm}" method="post">
+        <div>
+            <label for="reservationDatetime">予約日時:</label>
+            <input type="text" id="reservationDatetime" th:field="*{reservationDatetime}"/>
+        </div>
+        <div>
+            <label for="numberOfPeople">予約人数:</label>
+            <input type="number" id="numberOfPeople" th:field="*{numberOfPeople}"/>
+        </div>
+        <div>
+            <button type="submit">予約する</button>
+        </div>
+        <div th:if="${errorMessage}">
+            <p th:text="${errorMessage}" style="color:red;"></p>
+        </div>
+    </form>                                                                                                                  
                                 </div>                                                                                             
                             </div>
                         </div>
@@ -118,6 +138,11 @@
             <div th:replace="~{fragment :: footer}"></div>
         </div>    
         
-        <div th:replace="~{fragment :: scripts}"></div>  
+        <div th:replace="~{fragment :: scripts}"></div>
+        
+        <!-- Flatpickr -->
+         <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+         <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/ja.js"></script>
+         <script th:src="@{/js/flatpickr.js}"></script>
   </body>
 </html>

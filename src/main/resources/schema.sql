@@ -71,11 +71,13 @@ CREATE TABLE IF NOT EXISTS stores (
     address VARCHAR(255) NOT NULL, -- 住所
     phone_number VARCHAR(20) NOT NULL, -- 電話番号
     opening_hours VARCHAR(50) NOT NULL, -- 営業時間
+    closing_time TIME NOT NULL, -- 閉店時間 
     closed_days VARCHAR(50) NOT NULL, -- 定休日
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (category_id) REFERENCES categories(category_id) -- 外部キー制約
 );
+
 
 -- 店舗情報とカテゴリの中間テーブル
 CREATE TABLE IF NOT EXISTS store_category (

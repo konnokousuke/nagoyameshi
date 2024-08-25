@@ -45,6 +45,9 @@ public class StoreService {
 		store.setOpeningHours(storeRegisterForm.getOpeningHours());
 		store.setClosedDays(storeRegisterForm.getClosedDays());
 		
+		// 営業終了時間と定休日をセット
+	    store.setClosingTime(storeRegisterForm.getClosingTime()); // フォームにclosingTimeフィールドがある前提
+	    store.setDayOffs(storeRegisterForm.getDayOffs()); // フォームにdayOffsフィールドがある前提
 		
 		storeRepository.save(store);
 	}
@@ -71,7 +74,9 @@ public class StoreService {
 		store.setOpeningHours(storeEditForm.getOpeningHours());
 		store.setClosedDays(storeEditForm.getClosedDays());
 		
-		
+		// 営業終了時間と定休日をセット
+		store.setClosingTime(storeEditForm.getClosingTime()); // フォームにclosingTimeフィールドがある前提
+		store.setDayOffs(storeEditForm.getDayOffs()); // フォームにdayOffsフィールドがある前提
 		storeRepository.save(store);
 	}
 	

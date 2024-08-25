@@ -1,5 +1,9 @@
 package com.example.nagoyameshi.form;
 
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.util.Set;
+
 import org.springframework.web.multipart.MultipartFile;
 
 import jakarta.validation.constraints.Min;
@@ -35,4 +39,24 @@ public class StoreRegisterForm {
 	
 	@NotBlank(message = "定休日を入力してください。")
 	private String closedDays;
+	
+	private LocalTime closingTime; // 営業終了時間
+    private Set<DayOfWeek> dayOffs; // 定休日
+
+    // Getters and Setters
+    public LocalTime getClosingTime() {
+        return closingTime;
+    }
+
+    public void setClosingTime(LocalTime closingTime) {
+        this.closingTime = closingTime;
+    }
+
+    public Set<DayOfWeek> getDayOffs() {
+        return dayOffs;
+    }
+
+    public void setDayOffs(Set<DayOfWeek> dayOffs) {
+        this.dayOffs = dayOffs;
+    }
 }
