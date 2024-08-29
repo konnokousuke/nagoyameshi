@@ -31,7 +31,7 @@
                         </div>                                                                         
                         
                         <div class="mb-4">
-                            <img th:if="${store.getImageFilename()}" th:src="@{/storage/__${store.getImageFilename()}__}" class="w-100" alt="民宿画像">
+                            <img th:if="${store.getImageFilename()}" th:src="@{/storage/__${store.getImageFilename()}__}" class="w-100" alt="店舗画像">
                             <img th:unless="${store.getImageFilename()}" th:src="@{/images/noImage.png}" class="w-100" alt="NO IMAGE">
                         </div> 
                         
@@ -40,7 +40,7 @@
                                 <div class="col-lg-8 container mb-4">            
                                     <div class="row pb-2 mb-2 border-bottom">
                                         <div class="col-4">
-                                            <span class="fw-bold">民宿名</span>
+                                            <span class="fw-bold">店舗名</span>
                                         </div>
                                         <div class="col">
                                             <span th:text="${store.getStoreName()}"></span>
@@ -85,7 +85,23 @@
                                         <div class="col">
                                             <span th:text="${store.getPhoneNumber()}"></span>
                                         </div>
-                                    </div>                                
+                                    </div>
+                                    <div class="row pb-2 mb-2 border-bottom">
+                                        <div class="col-4">
+                                            <span class="fw-bold">営業時間</span>
+                                        </div>
+                                        <div class="col">
+                                            <span th:text="${store.getOpeningHours()}"></span>
+                                        </div>
+                                    </div>
+                                    <div class="row pb-2 mb-2 border-bottom">
+                                        <div class="col-4">
+                                            <span class="fw-bold">定休日</span>
+                                        </div>
+                                        <div class="col">
+                                            <span th:text="${store.getClosedDays()}"></span>
+                                        </div>
+                                    </div>                              
                                 </div>
                                 
                                 <!-- ログインユーザーが無料会員の場合のメッセージ表示 -->
