@@ -56,4 +56,8 @@ public class MemberDetailsImpl implements UserDetails {
     public Member getMember() {
         return member;
     }
+
+    public boolean isPaidMember() {
+        return member.isPaidMember();
+    }
 }

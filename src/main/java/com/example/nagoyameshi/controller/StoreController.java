@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -19,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.example.nagoyameshi.entity.Store;
 import com.example.nagoyameshi.form.ReservationInputForm;
 import com.example.nagoyameshi.repository.StoreRepository;
+import com.example.nagoyameshi.security.MemberDetailsImpl;
 
 import jakarta.validation.Valid;
 
@@ -72,9 +75,15 @@ public class StoreController {
     @GetMapping("/{id}")
     public String show(@PathVariable(name = "id") Long id, Model model) {
         Store store = storeRepository.getReferenceById(id);
-        
         model.addAttribute("store", store);
         model.addAttribute("reservationForm", new ReservationInputForm());
+
+        // ログインユーザーが有料会員かどうかを判断
+        if (isPaidMember()) {
+            model.addAttribute("isPaidMember", true);
+        } else {
+            model.addAttribute("isPaidMember", false);
+        }
         
         return "stores/show";
     }
@@ -119,7 +128,17 @@ public class StoreController {
     }
 
     private boolean isPaidMember() {
-        // ログインユーザーが有料会員かどうかを確認するロジックを実装する
-        return true; // 仮に有料会員とする
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return false;
+        }
+
+        Object principal = authentication.getPrincipal();
+        if (principal instanceof MemberDetailsImpl) {
+            MemberDetailsImpl userDetails = (MemberDetailsImpl) principal;
+            return userDetails.isPaidMember();
+        }
+
+        return false;
     }
 }
