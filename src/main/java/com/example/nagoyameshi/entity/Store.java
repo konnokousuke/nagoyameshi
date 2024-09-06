@@ -5,6 +5,7 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 import java.util.Set;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
@@ -17,6 +18,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -29,7 +31,6 @@ public class Store {
 	@Column(name = "store_id")
 	private Long storeId;
 	
-	// 新しく追加する部分
 	@ManyToMany(fetch = FetchType.EAGER)
 	@JoinTable(
 		name = "store_category",
@@ -65,16 +66,28 @@ public class Store {
 	@Column(name = "opening_hours", nullable = false)
 	private String openingHours;
 	
-	@Column(name = "closed_days", nullable = false)
+	@Column(name = "closed_days", nullable = false)	
 	private String closedDays;
 	
 	@Column(name = "closing_time", nullable = false)
 	private LocalTime closingTime;
 	
+	@OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	private Set<StoreDayOffs> storeDayOffs;
+	
+	// 定休日（DayOfWeek）のセットを保持
 	@ElementCollection(targetClass = DayOfWeek.class)
 	@Enumerated(EnumType.STRING)
 	@Column(name = "day_offs")
 	private Set<DayOfWeek> dayOffs;
+	// dayOffs のセッター
+	public void setDayOffs(Set<DayOfWeek> dayOffs) {
+	this.dayOffs = dayOffs;
+	}
+	// dayOffs のゲッター
+	public Set<DayOfWeek> getDayOffs() {
+	return dayOffs;
+	}
 
 	@Column(name = "created_at", insertable = false, updatable = false)
 	private Timestamp createdAt;

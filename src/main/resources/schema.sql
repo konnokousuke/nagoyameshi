@@ -88,6 +88,15 @@ CREATE TABLE IF NOT EXISTS store_category (
     FOREIGN KEY (category_id) REFERENCES categories(category_id)
 );
 
+-- 店舗の休業日を管理するテーブル
+CREATE TABLE IF NOT EXISTS store_day_offs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    store_id INT NOT NULL,
+    day_of_week VARCHAR(10) NOT NULL,
+    FOREIGN KEY (store_id) REFERENCES stores(store_id)
+);
+
+
 -- 予約テーブル
 CREATE TABLE IF NOT EXISTS reservations (
     reservation_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,

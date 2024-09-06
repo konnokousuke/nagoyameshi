@@ -2,25 +2,27 @@ package com.example.nagoyameshi.form;
 
 import java.time.LocalDateTime;
 
-import org.springframework.format.annotation.DateTimeFormat;
-
 import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
-public class ReservationInputForm {
+public class ReservationRegisterForm {
 
-    @NotNull(message = "予約日時を入力してください。")
+    @NotNull(message = "予約日時は必須です。")
     @Future(message = "予約日時は未来の日付を指定してください。")
-    @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm")
     private LocalDateTime reservationDatetime;
 
-    @NotNull(message = "予約人数を入力してください。")
+    @NotNull(message = "予約人数は必須です。")
+    @Min(value = 1, message = "予約人数は1人以上を指定してください。")
     private Integer numberOfPeople;
 
-    @NotNull(message = "店舗IDを入力してください。")  // 店舗IDのバリデーションメッセージ
-    private Long storeId;  // storeIdフィールドを追加
+    @NotNull(message = "店舗IDは必須です。")
+    private Long storeId;
 
-    // ゲッターとセッター
+    @NotNull(message = "会員IDは必須です。")
+    private Integer memberId;
+
+    // Getter and Setter methods
     public LocalDateTime getReservationDatetime() {
         return reservationDatetime;
     }
@@ -37,11 +39,19 @@ public class ReservationInputForm {
         this.numberOfPeople = numberOfPeople;
     }
 
-    public Long getStoreId() {  // storeIdのゲッター
+    public Long getStoreId() {
         return storeId;
     }
 
-    public void setStoreId(Long storeId) {  // storeIdのセッター
+    public void setStoreId(Long storeId) {
         this.storeId = storeId;
+    }
+
+    public @NotNull(message = "会員IDは必須です。") Integer getMemberId() {
+        return memberId;
+    }
+
+    public void setMemberId(Integer integer) {
+        this.memberId = integer;
     }
 }

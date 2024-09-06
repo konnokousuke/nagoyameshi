@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">    
+<html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
-    <div th:replace="~{fragment :: meta}"></div>   
+    <div th:replace="~{fragment :: meta}"></div>
     <div th:replace="~{fragment :: styles}"></div>
     <!-- Flatpickr -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <title>店舗詳細</title>   
+    <title>店舗詳細</title>
 </head>
 <body>
     <div class="nagoyameshi-wrapper">
@@ -24,124 +24,143 @@
                             </ol>
                         </nav> 
                         
-                        <h1 class="mb-4 text-center" th:text="${store.getStoreName()}"></h1>                                                           
-                        
-                        <div th:if="${errorMessage}" class="alert alert-danger">
-                            <span th:text="${errorMessage}"></span>
-                        </div>                                                                         
-                        
-                        <div class="mb-4">
-                            <img th:if="${store.getImageFilename()}" th:src="@{/storage/__${store.getImageFilename()}__}" class="w-100" alt="店舗画像">
-                            <img th:unless="${store.getImageFilename()}" th:src="@{/images/noImage.png}" class="w-100" alt="NO IMAGE">
-                        </div> 
-                        
-                        <div class="container">  
-                            <div class="row">
-                                <div class="col-lg-8 container mb-4">            
-                                    <div class="row pb-2 mb-2 border-bottom">
-                                        <div class="col-4">
-                                            <span class="fw-bold">店舗名</span>
-                                        </div>
-                                        <div class="col">
-                                            <span th:text="${store.getStoreName()}"></span>
-                                        </div>
-                                    </div>                    
-                                    <div class="row pb-2 mb-2 border-bottom">
-                                        <div class="col-4">
-                                            <span class="fw-bold">説明</span>
-                                        </div>
-                                        <div class="col">
-                                            <span class="nagoyameshi-pre-wrap" th:text="${store.getDescription()}"></span>
-                                        </div>
-                                    </div>
-                                    <div class="row pb-2 mb-2 border-bottom">
-                                        <div class="col-4">
-                                            <span class="fw-bold">料金</span>
-                                        </div>
-                                        <div class="col">
-                                            <span th:text="${#numbers.formatInteger(store.getPrice(), 1, 'COMMA') + '円'}"></span>
-                                        </div>
-                                    </div>                                                                     
-                                    <div class="row pb-2 mb-2 border-bottom">
-                                        <div class="col-4">
-                                            <span class="fw-bold">郵便番号</span>
-                                        </div>
-                                        <div class="col">
-                                            <span th:text="${store.getPostalCode()}"></span>
-                                        </div>
-                                    </div>   
-                                    <div class="row pb-2 mb-2 border-bottom">
-                                        <div class="col-4">
-                                            <span class="fw-bold">住所</span>
-                                        </div>
-                                        <div class="col">
-                                            <span th:text="${store.getAddress()}"></span>
-                                        </div>
-                                    </div>   
-                                    <div class="row pb-2 mb-2 border-bottom">
-                                        <div class="col-4">
-                                            <span class="fw-bold">電話番号</span>
-                                        </div>
-                                        <div class="col">
-                                            <span th:text="${store.getPhoneNumber()}"></span>
-                                        </div>
-                                    </div>
-                                    <div class="row pb-2 mb-2 border-bottom">
-                                        <div class="col-4">
-                                            <span class="fw-bold">営業時間</span>
-                                        </div>
-                                        <div class="col">
-                                            <span th:text="${store.getOpeningHours()}"></span>
-                                        </div>
-                                    </div>
-                                    <div class="row pb-2 mb-2 border-bottom">
-                                        <div class="col-4">
-                                            <span class="fw-bold">定休日</span>
-                                        </div>
-                                        <div class="col">
-                                            <span th:text="${store.getClosedDays()}"></span>
-                                        </div>
-                                    </div>                              
-                                </div>
-                                
-                                <!-- ログインユーザーが無料会員の場合のメッセージ表示 -->
-                                <div sec:authorize="!isAuthenticated()" class="col-lg-4 px-0 ps-lg-4 mb-4">                  
-                                    <div class="card">
-                                        <div class="card-body">                                                                                                                                                                                                                     
-                                            <p class="card-text">予約するには<a th:href="@{/login}">ログイン</a>が必要です。</p>                                                                                                                                            
-                                            <button type="submit" class="btn text-white shadow-sm w-100 nagoyameshi-btn" disabled>予約する</button>                                                                                                                
-                                        </div>
-                                    </div>  
-                                </div>
+                        <h1 class="mb-4 text-center" th:text="${store != null ? store.getStoreName() : '店舗情報が見つかりません'}"></h1>
 
-                                <!-- ログインユーザーが有料会員の場合の予約フォーム -->
-                                <div sec:authorize="isAuthenticated()" th:if="${isPaidMember}" class="col-lg-4 px-0 ps-lg-4 mb-4">
-                                    <form th:action="@{/stores/{id}/reserve(id=${store.storeId})}" th:object="${reservationForm}" method="post">
-                                        <div>
-                                            <label for="reservationDatetime">予約日時:</label>
-                                            <input type="text" id="reservationDatetime" th:field="*{reservationDatetime}"/>
-                                        </div>
-                                        <div>
-                                            <label for="numberOfPeople">予約人数:</label>
-                                            <input type="number" id="numberOfPeople" th:field="*{numberOfPeople}"/>
-                                        </div>
-                                        <div>
-                                            <button type="submit">予約する</button>
-                                        </div>
-                                        <div th:if="${errorMessage}">
-                                            <p th:text="${errorMessage}" style="color:red;"></p>
-                                        </div>
-                                    </form>
-                                </div>
+                        <!-- storeがnullの場合のエラーメッセージ -->
+                        <div th:if="${store == null}" class="alert alert-danger">
+                            <span>店舗情報が見つかりません。お手数ですが、再度お試しください。</span>
+                        </div>
 
-                                <!-- ログインユーザーが無料会員の場合のメッセージ表示 -->
-                                <div sec:authorize="isAuthenticated()" th:if="${!isPaidMember}" class="col-lg-4 px-0 ps-lg-4 mb-4">
-                                    <div class="card">
-                                        <div class="card-body">                                                                                                                                                                                                                     
-                                            <p class="card-text">予約するには有料会員への登録が必要です。</p>                                                                                                                                            
-                                            <button type="submit" class="btn text-white shadow-sm w-100 nagoyameshi-btn" disabled>予約する</button>                                                                                                                
+                        <!-- storeが存在する場合の情報表示 -->
+                        <div th:if="${store != null}">
+                            <div th:if="${errorMessage}" class="alert alert-danger">
+                                <span th:text="${errorMessage}"></span>
+                            </div>
+
+                            <div class="mb-4">
+                                <img th:if="${store.getImageFilename()}" th:src="@{/storage/__${store.getImageFilename()}__}" class="w-100" alt="店舗画像">
+                                <img th:unless="${store.getImageFilename()}" th:src="@{/images/noImage.png}" class="w-100" alt="NO IMAGE">
+                            </div> 
+                            
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-lg-8 container mb-4">            
+                                        <!-- 各種店舗情報の表示 -->
+                                        <div class="row pb-2 mb-2 border-bottom">
+                                            <div class="col-4">
+                                                <span class="fw-bold">店舗名</span>
+                                            </div>
+                                            <div class="col">
+                                                <span th:text="${store.getStoreName()}"></span>
+                                            </div>
                                         </div>
-                                    </div>  
+                                        <div class="row pb-2 mb-2 border-bottom">
+                                            <div class="col-4">
+                                                <span class="fw-bold">説明</span>
+                                            </div>
+                                            <div class="col">
+                                                <span class="nagoyameshi-pre-wrap" th:text="${store.getDescription()}"></span>
+                                            </div>
+                                        </div>
+                                        <div class="row pb-2 mb-2 border-bottom">
+                                            <div class="col-4">
+                                                <span class="fw-bold">料金</span>
+                                            </div>
+                                            <div class="col">
+                                                <span th:text="${#numbers.formatInteger(store.getPrice(), 1, 'COMMA') + '円'}"></span>
+                                            </div>
+                                        </div>
+                                        <div class="row pb-2 mb-2 border-bottom">
+                                            <div class="col-4">
+                                                <span class="fw-bold">郵便番号</span>
+                                            </div>
+                                            <div class="col">
+                                                <span th:text="${store.getPostalCode()}"></span>
+                                            </div>
+                                        </div>
+                                        <div class="row pb-2 mb-2 border-bottom">
+                                            <div class="col-4">
+                                                <span class="fw-bold">住所</span>
+                                            </div>
+                                            <div class="col">
+                                                <span th:text="${store.getAddress()}"></span>
+                                            </div>
+                                        </div>
+                                        <div class="row pb-2 mb-2 border-bottom">
+                                            <div class="col-4">
+                                                <span class="fw-bold">電話番号</span>
+                                            </div>
+                                            <div class="col">
+                                                <span th:text="${store.getPhoneNumber()}"></span>
+                                            </div>
+                                        </div>
+                                        <div class="row pb-2 mb-2 border-bottom">
+                                            <div class="col-4">
+                                                <span class="fw-bold">営業時間</span>
+                                            </div>
+                                            <div class="col">
+                                                <span th:text="${store.getOpeningHours()}"></span>
+                                            </div>
+                                        </div>
+                                        <div class="row pb-2 mb-2 border-bottom">
+                                            <div class="col-4">
+                                                <span class="fw-bold">定休日</span>
+                                            </div>
+                                            <div class="col">
+                                                <span th:text="${store.getClosedDays()}"></span>
+                                            </div>
+                                        </div>                              
+                                    </div>
+
+                                    <!-- ログインユーザーが無料会員の場合のメッセージ表示 -->
+                                    <div sec:authorize="!isAuthenticated()" class="col-lg-4 px-0 ps-lg-4 mb-4">                  
+                                        <div class="card">
+                                            <div class="card-body">                                                                                                                                                                                                                     
+                                                <p class="card-text">予約するには<a th:href="@{/login}">ログイン</a>が必要です。</p>                                                                                                                                            
+                                                <button type="submit" class="btn text-white shadow-sm w-100 nagoyameshi-btn" disabled>予約する</button>                                                                                                                
+                                            </div>
+                                        </div>  
+                                    </div>
+
+                                    <!-- ログインユーザーが有料会員の場合の予約フォーム -->
+                                    <div sec:authorize="isAuthenticated()" th:if="${isPaidMember}" class="col-lg-4 px-0 ps-lg-4 mb-4">
+                                        <form th:action="@{/stores/{id}/reserve(id=${store.storeId})}" th:object="${reservationInputForm}" method="post">
+											<!-- storeIdを保持するhiddenフィールドを追加 -->
+                                              <input type="hidden" name="storeId" th:value="${store.storeId}">
+                                            <div>
+                                                <label for="reservationDatetime">予約日時:</label>
+                                                <input type="text" id="reservationDatetime" th:field="*{reservationDatetime}" class="flatpickr"/>
+                                            </div>
+                                            <div>
+                                                <label for="numberOfPeople">予約人数:</label>
+                                                <input type="number" id="numberOfPeople" th:field="*{numberOfPeople}" min="1"/>
+                                            </div>
+                                            <div>
+                                                <button type="submit">予約する</button>
+                                            </div>
+                                            
+                                            <!-- バリデーションエラーメッセージの表示 -->
+                                            <div th:if="${validationErrors}">
+												<ul>
+													<li th:each="error : ${validationErrors}" th:text="${error.defaultMessage}" style="color:red"></li>
+												</ul>
+											</div>
+											
+                                            <div th:if="${errorMessage}">
+                                                <p th:text="${errorMessage}" style="color:red;"></p>
+                                            </div>
+                                        </form>
+                                    </div>
+
+                                    <!-- ログインユーザーが無料会員の場合のメッセージ表示 -->
+                                    <div sec:authorize="isAuthenticated()" th:if="${!isPaidMember}" class="col-lg-4 px-0 ps-lg-4 mb-4">
+                                        <div class="card">
+                                            <div class="card-body">                                                                                                                                                                                                                     
+                                                <p class="card-text">予約するには有料会員への登録が必要です。</p>                                                                                                                                            
+                                                <button type="submit" class="btn text-white shadow-sm w-100 nagoyameshi-btn" disabled>予約する</button>                                                                                                                
+                                            </div>
+                                        </div>  
+                                    </div>
                                 </div>
                             </div>                                                                                             
                         </div>
