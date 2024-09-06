@@ -32,51 +32,60 @@ public class ReservationService {
      * 予約日時が適切かどうかをチェックするメソッド
      * @param store 店舗情報
      * @param reservationDatetime 予約日時
-     * @return 適切であればtrue、不適切であればfalse
+     * @return エラーメッセージ、適切であればnull
      */
-    public boolean isReservationDateTimeValid(Store store, LocalDateTime reservationDatetime) {
+    public String isReservationDateTimeValid(Store store, LocalDateTime reservationDatetime) {
+    	
+    	 // デバッグ用出力: 定休日の確認
+        System.out.println("定休日の一覧:");
+        store.getStoreDayOffs().forEach(dayOff -> {
+            System.out.println("定休日: " + dayOff.getDayOfWeek());
+        });
+        System.out.println("予約日: " + reservationDatetime.getDayOfWeek());
+        
         // 現在日時より過去の日時を選択した場合、無効
         if (reservationDatetime.isBefore(LocalDateTime.now())) {
-            return false;
+            return "指定した日時は過去の日時です。";
         }
 
         // 営業終了一時間前以内の予約は無効
         LocalDateTime closingTimeWithMargin = reservationDatetime.toLocalDate().atTime(store.getClosingTime().minusHours(1));
         if (reservationDatetime.isAfter(closingTimeWithMargin)) {
-            return false;
+            return "営業終了一時間前は指定できません。";
         }
 
         // 定休日に予約した場合、無効
         DayOfWeek reservationDay = reservationDatetime.getDayOfWeek();
         if (store.getStoreDayOffs().stream().anyMatch(dayOff -> dayOff.getDayOfWeek().equals(reservationDay))) {
-            return false;
+            return "定休日は指定できません。";
         }
 
-        // 全てのチェックに合格した場合、予約は有効
-        return true;
+        // エラーがない場合は null を返す
+        return null;
     }
 
     /**
      * 予約のバリデーションを行うメソッド
      * @param form 予約フォーム
-     * @return バリデーションが成功したら true、失敗したら false
+     * @return エラーメッセージ、成功したらnull
      */
-    public boolean validateReservation(ReservationInputForm form) {
+    public String validateReservation(ReservationInputForm form) {
         // storeIdからStoreを取得
         Store store = storeRepository.findById(form.getStoreId())
                         .orElseThrow(() -> new IllegalArgumentException("Invalid store ID: " + form.getStoreId()));
 
         // 予約日時が現在日時より後であることをチェック
         if (form.getReservationDatetime().isBefore(LocalDateTime.now())) {
-            return false; // 無効な予約
+            return "指定した日時は無効です。"; // 無効な予約
         }
 
         // 営業終了時間や定休日などのバリデーションロジックを追加
-        if (!isReservationDateTimeValid(store, form.getReservationDatetime())) {
-            return false;
+        String errorMessage = isReservationDateTimeValid(store, form.getReservationDatetime());
+        if (errorMessage != null) {
+            return errorMessage;
         }
 
-        return true; // 有効な予約
+        return null; // 有効な予約
     }
 
     /**

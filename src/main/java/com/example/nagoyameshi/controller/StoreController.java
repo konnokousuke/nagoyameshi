@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.example.nagoyameshi.entity.Reservation;
 import com.example.nagoyameshi.entity.Store;
@@ -94,7 +95,7 @@ public class StoreController {
     }
 
     @PostMapping("/{id}/reserve")
-    public String confirmReservation(@Valid ReservationInputForm form, BindingResult bindingResult, Model model, @PathVariable("id") Long storeId) {
+    public String confirmReservation(@Valid ReservationInputForm form, BindingResult bindingResult, Model model, @PathVariable("id") Long storeId, RedirectAttributes redirectAttributes) {
         try {
             Optional<Store> storeOptional = storeRepository.findById(storeId);
             if (!storeOptional.isPresent()) {
@@ -112,9 +113,10 @@ public class StoreController {
                 return "stores/show";
             }
 
-            // 予約日時のチェック
-            if (!reservationService.isReservationDateTimeValid(store, form.getReservationDatetime())) {
-                model.addAttribute("errorMessage", "指定した日時は無効です。");
+            // 営業終了時間や定休日などのバリデーションロジックを追加
+            String errorMessage = reservationService.isReservationDateTimeValid(store, form.getReservationDatetime());
+            if (errorMessage != null) {
+                model.addAttribute("errorMessage", errorMessage);
                 return "stores/show";
             }
 
@@ -127,6 +129,8 @@ public class StoreController {
             MemberDetailsImpl memberDetails = (MemberDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             reservationService.create(reservation, memberDetails.getMember().getId(), storeId);
 
+            // 予約完了後にリダイレクトし、`reserved` パラメータをクエリに追加
+            redirectAttributes.addAttribute("reserved", true);
             return "redirect:/reservations";
         } catch (Exception e) {
             e.printStackTrace();
@@ -134,6 +138,7 @@ public class StoreController {
             return "stores/show";
         }
     }
+
     
     @PostMapping("/reservation/confirm")
     public String confirmReservation(@ModelAttribute ReservationInputForm reservationInputForm, Model model) {
