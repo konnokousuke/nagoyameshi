@@ -4,16 +4,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Set;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.nagoyameshi.entity.Store;
-import com.example.nagoyameshi.entity.StoreDayOffs;
 import com.example.nagoyameshi.form.StoreEditForm;
 import com.example.nagoyameshi.form.StoreRegisterForm;
 import com.example.nagoyameshi.repository.StoreRepository;
@@ -49,17 +46,6 @@ public class StoreService {
 		store.setClosedDays(storeRegisterForm.getClosedDays());
 		
 	    store.setClosingTime(storeRegisterForm.getClosingTime()); // フォームにclosingTimeフィールドがある前提
-	    
-	 // 定休日のセット
-	    Set<StoreDayOffs> storeDayOffs = storeRegisterForm.getDayOffs().stream()
-	            .map(dayOfWeek -> {
-	                StoreDayOffs dayOff = new StoreDayOffs();
-	                dayOff.setDayOfWeek(dayOfWeek);
-	                dayOff.setStore(store); // Storeエンティティに関連付ける
-	                return dayOff;
-	            }).collect(Collectors.toSet());
-
-	    store.setStoreDayOffs(storeDayOffs); // StoreのStoreDayOffsフィールドにセット
 		
 		storeRepository.save(store);
 	}
@@ -87,17 +73,6 @@ public class StoreService {
 		store.setClosedDays(storeEditForm.getClosedDays());
 		
 		store.setClosingTime(storeEditForm.getClosingTime()); // フォームにclosingTimeフィールドがある前提
-		
-		// 定休日の更新
-	    Set<StoreDayOffs> storeDayOffs = storeEditForm.getDayOffs().stream()
-	            .map(dayOfWeek -> {
-	                StoreDayOffs dayOff = new StoreDayOffs();
-	                dayOff.setDayOfWeek(dayOfWeek);
-	                dayOff.setStore(store); // Storeエンティティに関連付ける
-	                return dayOff;
-	            }).collect(Collectors.toSet());
-
-	    store.setStoreDayOffs(storeDayOffs); // StoreのStoreDayOffsフィールドにセット
 	    
 		storeRepository.save(store);
 	}

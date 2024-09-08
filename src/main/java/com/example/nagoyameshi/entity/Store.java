@@ -4,7 +4,6 @@ import java.sql.Timestamp;
 import java.time.LocalTime;
 import java.util.Set;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -14,7 +13,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.Data;
 
@@ -67,9 +65,6 @@ public class Store {
 	
 	@Column(name = "closing_time", nullable = false)
 	private LocalTime closingTime;
-	
-	@OneToMany(mappedBy = "store", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-	private Set<StoreDayOffs> storeDayOffs;
 	
 
 	@Column(name = "created_at", insertable = false, updatable = false)

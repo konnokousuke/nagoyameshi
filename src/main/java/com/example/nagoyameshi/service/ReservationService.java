@@ -2,6 +2,8 @@ package com.example.nagoyameshi.service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,12 +38,8 @@ public class ReservationService {
      */
     public String isReservationDateTimeValid(Store store, LocalDateTime reservationDatetime) {
     	
-    	 // デバッグ用出力: 定休日の確認
-        System.out.println("定休日の一覧:");
-        store.getStoreDayOffs().forEach(dayOff -> {
-            System.out.println("定休日: " + dayOff.getDayOfWeek());
-        });
-        System.out.println("予約日: " + reservationDatetime.getDayOfWeek());
+    	// 定休日の文字列からリストを作成
+    	List<String> closedDays = Arrays.asList(store.getClosedDays().split(","));
         
         // 現在日時より過去の日時を選択した場合、無効
         if (reservationDatetime.isBefore(LocalDateTime.now())) {
@@ -53,11 +51,11 @@ public class ReservationService {
         if (reservationDatetime.isAfter(closingTimeWithMargin)) {
             return "営業終了一時間前は指定できません。";
         }
-
-        // 定休日に予約した場合、無効
+        
+     // 定休日に予約した場合、無効
         DayOfWeek reservationDay = reservationDatetime.getDayOfWeek();
-        if (store.getStoreDayOffs().stream().anyMatch(dayOff -> dayOff.getDayOfWeek().equals(reservationDay))) {
-            return "定休日は指定できません。";
+        if (closedDays.contains(reservationDay.name())) {
+        return "定休日は指定できません。";
         }
 
         // エラーがない場合は null を返す
