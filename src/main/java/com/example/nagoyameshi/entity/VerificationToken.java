@@ -16,22 +16,32 @@ import lombok.Data;
 @Table(name = "verification_tokens")
 @Data
 public class VerificationToken {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id")
-	private Long id;
-	
-	@OneToOne
-	@JoinColumn(name = "member_id")
-	private Member member;
-	
-	@Column(name = "token")
-	private String token;
-	
-	@Column(name = "created_at", insertable = false, updatable = false)
-	private Timestamp createdAt;
-	
-	@Column(name = "updated_at", insertable = false, updatable = false)
-	private Timestamp updatedAt;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
+
+    @OneToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
+
+    @Column(name = "token")
+    private String token;
+
+    @Column(name = "created_at", insertable = false, updatable = false)
+    private Timestamp createdAt;
+
+    @Column(name = "updated_at", insertable = false, updatable = false)
+    private Timestamp updatedAt;
+
+    // コンストラクタを追加
+    public VerificationToken(String token, Member member) {
+        this.token = token;
+        this.member = member;
+    }
+
+    // デフォルトコンストラクタ
+    public VerificationToken() {
+    }
 }

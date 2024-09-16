@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.example.nagoyameshi.entity.Member;
 import com.example.nagoyameshi.entity.Role;
 import com.example.nagoyameshi.form.MemberEditForm;
+import com.example.nagoyameshi.form.PaidSignupForm;
 import com.example.nagoyameshi.form.SignupForm;
 import com.example.nagoyameshi.repository.MemberRepository;
 import com.example.nagoyameshi.repository.RoleRepository;
@@ -23,6 +24,7 @@ public class MemberService {
 		this.passwordEncoder = passwordEncoder;
 	}
 	
+	// 無料会員用
 	@Transactional
 	public Member create(SignupForm signupForm) {
 		Member member = new Member();
@@ -37,6 +39,32 @@ public class MemberService {
 		member.setPassword(passwordEncoder.encode(signupForm.getPassword()));
 		member.setRole(role);
 		member.setEnabled(false);
+		member.setStatus(Member.Status.FREE); // 無料会員ステータスを設定
+		
+		return memberRepository.save(member);
+	}
+	
+	 @Transactional
+	    public Member save(Member member) {
+	        return memberRepository.save(member);
+	    }
+	 
+	// 有料会員用
+	@Transactional
+	public Member create(PaidSignupForm paidSignupForm) {
+		Member member = new Member();
+		Role role = roleRepository.findByName("ROLE_PAID");
+		
+		member.setName(paidSignupForm.getName());
+		member.setFurigana(paidSignupForm.getFurigana());
+		member.setPostalCode(paidSignupForm.getPostalCode());
+		member.setAddress(paidSignupForm.getAddress());
+		member.setPhoneNumber(paidSignupForm.getPhoneNumber());
+		member.setEmail(paidSignupForm.getEmail());
+		member.setPassword(passwordEncoder.encode(paidSignupForm.getPassword()));
+		member.setRole(role);
+		member.setEnabled(false);
+		member.setStatus(Member.Status.PAID); // 有料会員ステータスを設定
 		
 		return memberRepository.save(member);
 	}

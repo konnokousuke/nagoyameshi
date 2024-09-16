@@ -25,8 +25,12 @@ public class WebSecurityConfig {
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
+		.csrf(csrf -> csrf
+				.ignoringRequestMatchers("/stripe/webhook", "/paid_signup/session") // Stripe Webhook用にCSRFを無視する設定
+				)
+
 		    .authorizeHttpRequests((requests) -> requests
-		         .requestMatchers("/css/**", "/images/**", "/js/**", "/storage/**", "/", "/signup/**", "/stores", "/stores/{id}").permitAll() // すべてのユーザーにアクセスを許可するURL
+		         .requestMatchers("/css/**", "/images/**", "/js/**", "/storage/**", "/auth/**",  "/", "/signup/**", "/paid_signup/**", "/stores", "/stores/{id}", "/stripe/webhook", "/paid_confirm").permitAll() // すべてのユーザーにアクセスを許可するURL
 		         .requestMatchers("/admin/**").hasRole("ADMIN") // 管理者のみアクセスを許可するURL
 		         .requestMatchers("/paid/**").hasRole("PAID_MEMBER") // 有料会員のみアクセスを許可するURL
 		         .anyRequest().authenticated()                  // 上記以外のURLはログインが必要
@@ -42,13 +46,11 @@ public class WebSecurityConfig {
                 .logoutSuccessUrl("/?loggedOut") // ログアウト時のリダイレクト先URL
                 .permitAll()
                 )
-
+            
 		.userDetailsService(memberDetailsServiceImpl)
 		.userDetailsService(adminDetailsServiceImpl);
             return http.build();  
 	}
-	
-	
 	
 	@Bean
 	public PasswordEncoder passwordEncoder() {

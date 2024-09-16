@@ -41,7 +41,7 @@
                              <a th:href="@{/stores/__${newStore.getStoreId()}__}" class="link-dark nagoyameshi-card-link">
                                  <div class="card h-100">                                                                        
                                      <img th:if="${newStore.imageFilename}" th:src="@{/storage/__${newStore.imageFilename}__}" class="card-img-top nagoyameshi-vertical-card-image" alt="店舗画像">
-<img th:unless="${newStore.imageFilename}" th:src="@{/images/noImage.png}" class="card-img-top nagoyameshi-vertical-card-image" alt="NO IMAGE">                                                                                                                        
+                                     <img th:unless="${newStore.imageFilename}" th:src="@{/images/noImage.png}" class="card-img-top nagoyameshi-vertical-card-image" alt="NO IMAGE">                                                                                                                        
                                      <div class="card-body">                                    
                                          <h3 class="card-title" th:text="${newStore.storeName}"></h3>
                                          <p class="card-text mb-1">

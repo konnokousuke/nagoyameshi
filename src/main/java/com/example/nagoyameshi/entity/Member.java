@@ -42,7 +42,7 @@ public class Member {
     private String email;
     
     @Column(name = "password")
-    private String password;    
+    private String password; 
     
     @ManyToOne
     @JoinColumn(name = "role_id")
