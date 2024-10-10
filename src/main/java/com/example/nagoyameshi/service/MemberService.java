@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.nagoyameshi.entity.Member;
 import com.example.nagoyameshi.entity.Role;
+import com.example.nagoyameshi.entity.VerificationToken;
 import com.example.nagoyameshi.form.MemberEditForm;
 import com.example.nagoyameshi.form.PaidSignupForm;
 import com.example.nagoyameshi.form.SignupForm;
@@ -17,14 +18,17 @@ public class MemberService {
 	private final MemberRepository memberRepository;
 	private final RoleRepository roleRepository;
 	private final PasswordEncoder passwordEncoder;
+	private final VerificationTokenService verificationTokenService;
 	
-	public MemberService(MemberRepository memberRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+	public MemberService(MemberRepository memberRepository, RoleRepository roleRepository, 
+                         PasswordEncoder passwordEncoder, VerificationTokenService verificationTokenService) {
 		this.memberRepository = memberRepository;
 		this.roleRepository = roleRepository;
 		this.passwordEncoder = passwordEncoder;
+		this.verificationTokenService = verificationTokenService;
 	}
 	
-	// 無料会員用
+	// 無料会員の作成
 	@Transactional
 	public Member create(SignupForm signupForm) {
 		Member member = new Member();
@@ -39,17 +43,12 @@ public class MemberService {
 		member.setPassword(passwordEncoder.encode(signupForm.getPassword()));
 		member.setRole(role);
 		member.setEnabled(false);
-		member.setStatus(Member.Status.FREE); // 無料会員ステータスを設定
+		member.setStatus(Member.Status.FREE);  // 無料会員ステータス設定
 		
 		return memberRepository.save(member);
 	}
 	
-	 @Transactional
-	    public Member save(Member member) {
-	        return memberRepository.save(member);
-	    }
-	 
-	// 有料会員用
+	// 有料会員の作成
 	@Transactional
 	public Member create(PaidSignupForm paidSignupForm) {
 		Member member = new Member();
@@ -64,7 +63,7 @@ public class MemberService {
 		member.setPassword(passwordEncoder.encode(paidSignupForm.getPassword()));
 		member.setRole(role);
 		member.setEnabled(false);
-		member.setStatus(Member.Status.PAID); // 有料会員ステータスを設定
+		member.setStatus(Member.Status.PAID);  // 有料会員ステータス設定
 		
 		return memberRepository.save(member);
 	}
@@ -81,30 +80,49 @@ public class MemberService {
 		member.setEmail(memberEditForm.getEmail());
 		
 		memberRepository.save(member);
-		
 	}
 	
-	// メールアドレスが登録済みかどうかをチェックする
+	// メールアドレスの登録済みチェック
 	public boolean isEmailRegistered(String email) {
 		Member member = memberRepository.findByEmail(email);
 		return member != null;
 	}
 	
-	// パスワードとパスワード(確認用)の入力値が一致しているか判定する
+	// パスワード確認
 	public boolean isSamePassword(String password, String passwordConfirmation) {
 		return password.equals(passwordConfirmation);
 	}
 	
-	// ユーザーを有効にする
+	// 会員の有効化
 	@Transactional
 	public void enableMember(Member member) {
 		member.setEnabled(true);
 		memberRepository.save(member);
 	}
 	
-	// メールアドレスが変更されたかどうかをチェックする
+	// トークンの検証と会員の有効化
+	@Transactional
+	public Member verifyToken(String token) {
+	    VerificationToken verificationToken = verificationTokenService.getVerificationToken(token);
+
+	    if (verificationToken == null) {
+	        throw new IllegalArgumentException("無効なトークンです。");
+	    }
+
+	    Member member = verificationToken.getMember();
+	    enableMember(member);
+
+	    return member;
+	}
+	
+	// メールアドレスが変更されたかのチェック
 	public boolean isEmailChanged(MemberEditForm memberEditForm) {
 		Member currentMember = memberRepository.getReferenceById(memberEditForm.getId());
 		return !memberEditForm.getEmail().equals(currentMember.getEmail());
+	}
+	
+	// メールアドレスでの会員検索
+	public Member findByEmail(String email) {
+	    return memberRepository.findByEmail(email);
 	}
 }

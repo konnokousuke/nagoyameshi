@@ -12,16 +12,19 @@ document.getElementById('payment-button').addEventListener('click', function () 
         body: JSON.stringify({}),
     })
     .then(function (response) {
-        return response.json();
+        return response.json();  // ここでJSONとしてパース
     })
     .then(function (data) {
         if (data.url) {
             window.location.href = data.url; // セッションURLにリダイレクト
+        } else if (data.error) {
+            alert(data.error); // エラーメッセージを表示
         } else {
             alert('支払い登録中にエラーが発生しました。');
         }
     })
     .catch(function (error) {
         console.error('Error:', error);
+        alert('通信エラーが発生しました。');
     });
 });

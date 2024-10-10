@@ -96,8 +96,8 @@ public class StripeService {
 	    	.addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD) 
 	        .setCustomer(customer.getId())
 	        .setMode(SessionCreateParams.Mode.SUBSCRIPTION)
-	        .setSuccessUrl("https://your-site.com/success") // 成功時にリダイレクトするURL
-	        .setCancelUrl("https://your-site.com/cancel")   // キャンセル時にリダイレクトするURL
+	        .setSuccessUrl("http://localhost:8080/success?session_id={CHECKOUT_SESSION_ID}") // 成功時にリダイレクトするURL
+	        .setCancelUrl("http://localhost:8080/auth/cancel")   // キャンセル時にリダイレクトするURL
 	        .addLineItem(SessionCreateParams.LineItem.builder()
 	            .setPrice(priceId)
 	            .setQuantity(1L)
@@ -106,5 +106,11 @@ public class StripeService {
 
 	    return Session.create(params);
 	}
+	
+	// セッションIDからSessionオブジェクトを取得
+    public Session retrieveSession(String sessionId) throws StripeException {
+        setupStripe(); // APIキーを設定
+        return Session.retrieve(sessionId); // StripeのAPIを使ってSessionを取得
+    }
 
 }
