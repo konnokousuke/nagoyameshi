@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS members (
     address VARCHAR(255) NOT NULL, -- 住所
     phone_number VARCHAR(20) NOT NULL, -- 電話番号
     email VARCHAR(100) NOT NULL UNIQUE, -- メールアドレスはユニーク
+    customer_id VARCHAR(255) DEFAULT NULL, -- Stripeの顧客ID
     password VARCHAR(100) NOT NULL, -- パスワード
     role_id INT NOT NULL,
     enabled BOOLEAN NOT NULL, -- ユーザーが有効かどうか

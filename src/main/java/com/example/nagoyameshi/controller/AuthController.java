@@ -14,28 +14,25 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import com.example.nagoyameshi.entity.Member;
 import com.example.nagoyameshi.entity.VerificationToken;
 import com.example.nagoyameshi.event.SignupEventPublisher;
-import com.example.nagoyameshi.form.PaidSignupForm;
 import com.example.nagoyameshi.form.SignupForm;
 import com.example.nagoyameshi.service.MemberService;
 import com.example.nagoyameshi.service.StripeService;
 import com.example.nagoyameshi.service.VerificationTokenService;
-import com.stripe.exception.StripeException;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.validation.Valid;
 
 @Controller
 public class AuthController {
     private final MemberService memberService;
     private final SignupEventPublisher signupEventPublisher;
     private final VerificationTokenService verificationTokenService;
-    private final StripeService stripeService;
+    //private final StripeService stripeService;
     
     public AuthController(MemberService memberService, SignupEventPublisher signupEventPublisher, VerificationTokenService verificationTokenService, StripeService stripeService) {
         this.memberService = memberService;
         this.signupEventPublisher = signupEventPublisher;
         this.verificationTokenService = verificationTokenService;
-        this.stripeService = stripeService;
+        //this.stripeService = stripeService;
     }
 
     @GetMapping("/login")
@@ -93,7 +90,7 @@ public class AuthController {
         model.addAttribute(key, message);
         return "auth/verify";
     }
-
+/*
     // 有料会員登録
     @GetMapping("/paid_signup")
     public String paidSignup(Model model) {
@@ -133,4 +130,5 @@ public class AuthController {
             return "redirect:/auth/paid_signup";
         }
     }
+    */
 }

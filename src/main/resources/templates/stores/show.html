@@ -112,11 +112,12 @@
                                         </div>                              
                                     </div>
 
-                                    <!-- ログインユーザーが無料会員の場合のメッセージ表示 -->
+                                    <!-- ユーザーが未ログインの場合のメッセージ表示 -->
                                     <div sec:authorize="!isAuthenticated()" class="col-lg-4 px-0 ps-lg-4 mb-4">                  
                                         <div class="card">
                                             <div class="card-body">                                                                                                                                                                                                                     
-                                                <p class="card-text">予約するには<a th:href="@{/login}">ログイン</a>が必要です。</p>                                                                                                                                            
+                                                <p class="card-text">予約するには有料会員アカウントでの</br>
+                                                <a th:href="@{/login}">ログイン</a>が必要です。</p>                                                                                                                                            
                                                 <button type="submit" class="btn text-white shadow-sm w-100 nagoyameshi-btn" disabled>予約する</button>                                                                                                                
                                             </div>
                                         </div>  

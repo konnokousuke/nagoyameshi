@@ -1,5 +1,5 @@
 package com.example.nagoyameshi.form;
-
+/*
 import org.hibernate.validator.constraints.Length;
 
 import jakarta.validation.constraints.Email;
@@ -35,3 +35,4 @@ public class PaidSignupForm {
 	private String passwordConfirmation;
 	
 }
+*/

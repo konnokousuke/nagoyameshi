@@ -41,6 +41,10 @@ public class Member {
     @Column(name = "email")
     private String email;
     
+ // Stripe顧客IDを格納するためのフィールド
+    @Column(name = "customer_id", unique = true)
+    private String customerId;  // Stripeの顧客IDを保存
+    
     @Column(name = "password")
     private String password; 
     
@@ -49,7 +53,7 @@ public class Member {
     private Role role;   
     
     @Column(name = "enabled")
-    private Boolean enabled;
+    private Boolean enabled = true;
     
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)

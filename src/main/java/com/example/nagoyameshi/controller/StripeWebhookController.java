@@ -11,70 +11,70 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.nagoyameshi.entity.Member;
-import com.example.nagoyameshi.entity.VerificationToken;
-import com.example.nagoyameshi.event.SignupEventPublisher;
+import com.example.nagoyameshi.entity.Member.Status;
 import com.example.nagoyameshi.service.MemberService;
-import com.example.nagoyameshi.service.VerificationTokenService;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.model.Event;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
 
 @RestController
-@RequestMapping("/webhook")
+@RequestMapping("/stripe")
 public class StripeWebhookController {
 
     private static final Logger logger = LoggerFactory.getLogger(StripeWebhookController.class);
-
     private final MemberService memberService;
-    private final VerificationTokenService verificationTokenService;
-    private final SignupEventPublisher signupEventPublisher;
 
     @Value("${stripe.webhook.secret}")
     private String webhookSecret;
 
-    public StripeWebhookController(MemberService memberService, VerificationTokenService verificationTokenService, SignupEventPublisher signupEventPublisher) {
+    public StripeWebhookController(MemberService memberService) {
         this.memberService = memberService;
-        this.verificationTokenService = verificationTokenService;
-        this.signupEventPublisher = signupEventPublisher;
     }
 
-    @PostMapping("/stripe")
+    @PostMapping("/webhook")
     public ResponseEntity<String> handleStripeWebhook(@RequestBody String payload, @RequestHeader("Stripe-Signature") String sigHeader) {
-        logger.info("Received Stripe Webhook with payload: {}", payload);  // 受け取ったペイロードをログに出力
-        logger.info("Stripe-Signature header: {}", sigHeader);  // 署名ヘッダーをログに出力
+        logger.info("Received Stripe Webhook with payload: {}", payload);
+        logger.info("Stripe-Signature header: {}", sigHeader);
 
         try {
-            // Stripeのイベントを検証
             Event event = Webhook.constructEvent(payload, sigHeader, webhookSecret);
-
-            logger.info("Stripe Event type: {}", event.getType());  // イベントの種類をログに出力
+            logger.info("Stripe Event type: {}", event.getType());
 
             if ("checkout.session.completed".equals(event.getType())) {
-                Session session = (Session) event.getDataObjectDeserializer().getObject().orElse(null);
+                Session session = (Session) event.getDataObjectDeserializer().getObject().map(o -> (Session) o).orElse(null);
+
                 if (session != null) {
-                    String email = session.getCustomerDetails().getEmail();
-                    logger.info("Email from session: {}", email);  // 取得したメールアドレスをログに出力
+                    String customerId = session.getCustomer();
+                    String email = session.getCustomerDetails().getEmail(); // メールアドレスから検索するため
+
+                    logger.info("Customer ID from session: {}", customerId);
+                    logger.info("Email from session: {}", email);
+
+                    // メールアドレスで会員を検索
                     Member member = memberService.findByEmail(email);
-                    
-                    if (member != null) {
-                        // 認証トークンを生成し、メール送信
-                        VerificationToken token = verificationTokenService.createVerificationToken(member);
-                        signupEventPublisher.publishSignupEvent(member, token.getToken());
-                        logger.info("Verification email sent to: {}", email);  // メール送信が成功したことをログに出力
-                    } else {
-                        logger.warn("No member found for email: {}", email);  // メンバーが見つからない場合の警告をログに出力
+
+                    if (member == null) {
+                        logger.error("Member not found for email: {}", email);
+                        return ResponseEntity.status(404).body("Member not found");
                     }
+
+                    // 会員のステータスをPAIDに変更し、customerIdをセット
+                    member.setStatus(Status.PAID);
+                    member.setCustomerId(customerId); // customerIdを保存
+                    memberService.saveAndFlush(member);
+
+                    logger.info("Member {} status updated to PAID with customerId {}", member.getEmail(), customerId);
                 } else {
-                    logger.warn("Session data is null");  // セッションがnullの場合の警告をログに出力
+                    logger.warn("Session data is null");
                 }
             }
             return ResponseEntity.ok("Received webhook");
         } catch (SignatureVerificationException e) {
-            logger.error("Stripe signature verification failed: {}", e.getMessage());  // シグネチャ検証エラーをログに出力
+            logger.error("Stripe signature verification failed: {}", e.getMessage());
             return ResponseEntity.status(400).body("Invalid Stripe signature");
         } catch (Exception e) {
-            logger.error("Error processing webhook", e);  // 他のエラーをログに出力
+            logger.error("Error processing webhook", e);
             return ResponseEntity.status(500).body("Internal Server Error");
         }
     }

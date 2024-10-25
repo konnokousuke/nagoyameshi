@@ -9,4 +9,5 @@ import com.example.nagoyameshi.entity.Member;
 public interface MemberRepository extends JpaRepository<Member, Integer> {
 	public Member findByEmail(String email);
 	public Page<Member> findByNameLikeOrFuriganaLike(String nameKeyword, String furiganaKeyword, Pageable pageable);
+	public Member findByCustomerId(String customerId);
 }
