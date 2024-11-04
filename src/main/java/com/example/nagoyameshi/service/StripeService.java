@@ -85,7 +85,7 @@ public class StripeService {
                 .addPaymentMethodType(SessionCreateParams.PaymentMethodType.CARD) // カード決済を許可
                 .setCustomer(customer.getId()) // 顧客IDを設定
                 .setMode(SessionCreateParams.Mode.SUBSCRIPTION) // サブスクリプションモードを設定
-                .setSuccessUrl("http://localhost:8080/success?session_id={CHECKOUT_SESSION_ID}") // 成功時のリダイレクトURL
+                .setSuccessUrl("http://localhost:8080/member") // 成功時のリダイレクトURL
                 .setCancelUrl("http://localhost:8080/auth/cancel") // キャンセル時のリダイレクトURL
                 .addLineItem(SessionCreateParams.LineItem.builder()
                         .setPrice(priceId) // 価格IDを設定

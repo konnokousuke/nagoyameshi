@@ -31,12 +31,19 @@ public class MemberController {
 	
 	@GetMapping
 	public String index(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl, Model model) {
-		Member member = memberRepository.getReferenceById(memberDetailsImpl.getMember().getId());
-		
-		model.addAttribute("member", member);
-		
-		return "member/index";
+	    Member member = memberRepository.getReferenceById(memberDetailsImpl.getMember().getId());
+	    model.addAttribute("member", member);
+
+	    // 有料会員登録フラグを確認し、トーストメッセージを設定
+	    if (member.getStatus() == Member.Status.PAID && memberService.isPaidRegistrationComplete(member.getEmail())) {
+	        model.addAttribute("successMessage", "有料会員登録が完了しました");
+	        // トーストメッセージを表示後、フラグをクリア
+	        memberService.clearPaidRegistrationFlag(member.getEmail());
+	    }
+
+	    return "member/index";
 	}
+
 	
 	@GetMapping("/edit")
 	public String edit(@AuthenticationPrincipal MemberDetailsImpl memberDetailsImpl, Model model) {

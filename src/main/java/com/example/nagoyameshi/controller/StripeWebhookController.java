@@ -46,7 +46,7 @@ public class StripeWebhookController {
 
                 if (session != null) {
                     String customerId = session.getCustomer();
-                    String email = session.getCustomerDetails().getEmail(); // メールアドレスから検索するため
+                    String email = session.getCustomerDetails().getEmail();
 
                     logger.info("Customer ID from session: {}", customerId);
                     logger.info("Email from session: {}", email);
@@ -59,12 +59,15 @@ public class StripeWebhookController {
                         return ResponseEntity.status(404).body("Member not found");
                     }
 
-                    // 会員のステータスをPAIDに変更し、customerIdをセット
+                    // 会員のステータスをPAIDに変更し、役割を更新
                     member.setStatus(Status.PAID);
-                    member.setCustomerId(customerId); // customerIdを保存
+                    member.setCustomerId(customerId);
+                    memberService.updateRoleToPaid(member); // 役割をPAIDに更新
                     memberService.saveAndFlush(member);
+                    memberService.setPaidRegistrationFlag(member.getEmail(), true);
 
                     logger.info("Member {} status updated to PAID with customerId {}", member.getEmail(), customerId);
+                    return ResponseEntity.ok("有料会員登録が完了しました");
                 } else {
                     logger.warn("Session data is null");
                 }

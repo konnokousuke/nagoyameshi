@@ -101,20 +101,21 @@
 								</div>
 							</div>
 						</div>
+						
+						  <div class="row pb-2 mb-2 border-bottom">
+                               <div class="col-4">
+                                   <span class="fw-bold">クレジットカード</span>
+                               </div>
+                               
+                               <div class="col">
+								   <span th:text="${member.status == T(com.example.nagoyameshi.entity.Member.Status).PAID ? '登録済み' : '未登録'}"></span>
+                               </div>
+                          </div>
 					</div>
 				</div>
 			</div> 
 		</main>
 		
-		<!-- トーストメッセージ -->
-        <div id="toast-message" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" th:if="${successMessage}">
-            <div class="d-flex">
-                <div class="toast-body">
-                    <span th:text="${successMessage}"></span>
-                </div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        </div>
 		<!-- フッター -->
 		<div th:replace="~{fragment :: footer}"></div>
 	  </div>

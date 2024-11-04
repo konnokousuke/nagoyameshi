@@ -1,5 +1,8 @@
 package com.example.nagoyameshi.service;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +21,7 @@ public class MemberService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final VerificationTokenService verificationTokenService;
+    private final Map<String, Boolean> paidRegistrationFlags = new ConcurrentHashMap<>(); // 一時的に登録完了フラグを保持する
 
     public MemberService(MemberRepository memberRepository, RoleRepository roleRepository, 
                          PasswordEncoder passwordEncoder, VerificationTokenService verificationTokenService) {
@@ -144,5 +148,28 @@ public class MemberService {
     // customerIdで会員情報を取得
     public Member findByCustomerId(String customerId) {
         return memberRepository.findByCustomerId(customerId);
+    }
+    
+ // 有料会員登録完了フラグを設定
+    public void setPaidRegistrationFlag(String email, boolean flag) {
+        paidRegistrationFlags.put(email, flag);
+    }
+
+    // 有料会員登録完了フラグが設定されているか確認
+    public boolean isPaidRegistrationComplete(String email) {
+        return paidRegistrationFlags.getOrDefault(email, false);
+    }
+
+    // 有料会員登録完了フラグをクリア
+    public void clearPaidRegistrationFlag(String email) {
+        paidRegistrationFlags.remove(email);
+    }
+    
+    public void updateRoleToPaid(Member member) {
+        Role paidRole = roleRepository.findByName("ROLE_PAID"); // 役割「ROLE_PAID」を取得
+        if (paidRole != null) {
+            member.setRole(paidRole); // 役割を有料会員に設定
+            memberRepository.save(member); // データベースに保存して反映
+        }
     }
 }
