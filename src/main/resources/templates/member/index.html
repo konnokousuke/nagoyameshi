@@ -1,126 +1,181 @@
 <!DOCTYPE html>
 <html xmlns:th="https://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
-	<head>
-		<div th:replace="~{fragment :: meta}"></div>
-		
-		<div th:replace="~{fragment :: styles}"></div>
-		
-		<title>会員情報</title>
-	</head>
-	<body>
-		<div class="nagoyameshi-wrapper">
-		<!-- ヘッダー -->
-		<div th:replace="~{fragment :: header}"></div>
-		
-		<main>
-			<div class="container pb-5 nagoyameshi-container">
-				<div class="row justify-content-center">
-					<div class="col-xl-5 col-lg-6 col-md-8">
-						<nav class="my-3" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
-							<ol class="breadcrumb mb-0">
-								<li class="breadcrumb-item"><a th:href="@{/}">ホーム</a></li>
-								<li class="breadcrumb-item active" aria-current="page">会員情報</li>
-							</ol>
-						</nav>
-						
-						<h1 class="mb-3 text-center">会員情報</h1>
-						
-						<div class="d-flex justify-content-end align-items-end mb-3">
-							<div>
-								<a th:href="@{/member/edit}">編集</a>
-							</div>
-						</div>
-						
-						<div th:if="${successMessage}" class="alert alert-info">
-							<span th:text="${successMessage}"></span>
-						</div>
-						
-						<div class="container mb-4">
-							<div class="row pb-2 mb-2 border-bottom">
-								<div class="col-4">
-									<span class="fw-bold">氏名</span>
-								</div>
-								
-								<div class="col">
-									<span th:text="${member.getName()}"></span>
-								</div>
-							</div>
-							
-							<div class="container mb-4">
-							<div class="row pb-2 mb-2 border-bottom">
-								<div class="col-4">
-									<span class="fw-bold">フリガナ</span>
-								</div>
-								
-								<div class="col">
-									<span th:text="${member.getFurigana()}"></span>
-								</div>
-							</div>
-							
-							<div class="container mb-4">
-							<div class="row pb-2 mb-2 border-bottom">
-								<div class="col-4">
-									<span class="fw-bold">郵便番号</span>
-								</div>
-								
-								<div class="col">
-									<span th:text="${member.getPostalCode()}"></span>
-								</div>
-							</div>
-							
-							<div class="container mb-4">
-							<div class="row pb-2 mb-2 border-bottom">
-								<div class="col-4">
-									<span class="fw-bold">住所</span>
-								</div>
-								
-								<div class="col">
-									<span th:text="${member.getAddress()}"></span>
-								</div>
-							</div>
-							
-							<div class="container mb-4">
-							<div class="row pb-2 mb-2 border-bottom">
-								<div class="col-4">
-									<span class="fw-bold">電場番号</span>
-								</div>
-								
-								<div class="col">
-									<span th:text="${member.getPhoneNumber()}"></span>
-								</div>
-							</div>
-							
-							<div class="container mb-4">
-							<div class="row pb-2 mb-2 border-bottom">
-								<div class="col-4">
-									<span class="fw-bold">メールアドレス</span>
-								</div>
-								
-								<div class="col">
-									<span th:text="${member.getEmail()}"></span>
-								</div>
-							</div>
-						</div>
-						
-						  <div class="row pb-2 mb-2 border-bottom">
-                               <div class="col-4">
-                                   <span class="fw-bold">クレジットカード</span>
-                               </div>
-                               
-                               <div class="col">
-								   <span th:text="${member.status == T(com.example.nagoyameshi.entity.Member.Status).PAID ? '登録済み' : '未登録'}"></span>
-                               </div>
-                          </div>
-					</div>
-				</div>
-			</div> 
-		</main>
-		
-		<!-- フッター -->
-		<div th:replace="~{fragment :: footer}"></div>
-	  </div>
-	  
-	  <div th:replace="~{fragment :: scripts}"></div>
-	  <script src="/js/toast.js"></script>
-	</body>
+<head>
+    <div th:replace="~{fragment :: meta}"></div>
+    <div th:replace="~{fragment :: styles}"></div>
+    <title>会員情報</title>
+    
+    <!-- CSRFトークンを設定するメタタグを追加 -->
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+</head>
+<body>
+<div class="nagoyameshi-wrapper">
+    <!-- ヘッダー -->
+    <div th:replace="~{fragment :: header}"></div>
+
+    <main>
+        <div class="container pb-5 nagoyameshi-container">
+            <div class="row justify-content-center">
+                <div class="col-xl-5 col-lg-6 col-md-8">
+                    <nav class="my-3" style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a th:href="@{/}">ホーム</a></li>
+                            <li class="breadcrumb-item active" aria-current="page">会員情報</li>
+                        </ol>
+                    </nav>
+
+                    <h1 class="mb-3 text-center">会員情報</h1>
+
+                    <div class="d-flex justify-content-end align-items-end mb-3">
+                        <div>
+                            <a th:href="@{/member/edit}">編集</a>
+                        </div>
+                    </div>
+
+                    <!-- トーストメッセージの表示 -->
+                    <div th:if="${successMessage}" class="toast-container position-fixed top-0 start-50 translate-middle-x" style="z-index: 1050; margin-top: 1rem;">
+                        <div class="toast show">
+                            <div class="toast-body text-center">
+                                <span th:text="${successMessage}"></span>
+                                <div class="mt-2">
+                                    <button type="button" class="btn btn-primary btn-sm" onclick="logoutAndRedirect()">OK</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="container mb-4">
+                        <div class="row pb-2 mb-2 border-bottom">
+                            <div class="col-4">
+                                <span class="fw-bold">氏名</span>
+                            </div>
+                            <div class="col">
+                                <span th:text="${member.getName()}"></span>
+                            </div>
+                        </div>
+                        <div class="row pb-2 mb-2 border-bottom">
+                            <div class="col-4">
+                                <span class="fw-bold">フリガナ</span>
+                            </div>
+                            <div class="col">
+                                <span th:text="${member.getFurigana()}"></span>
+                            </div>
+                        </div>
+                        <div class="row pb-2 mb-2 border-bottom">
+                            <div class="col-4">
+                                <span class="fw-bold">郵便番号</span>
+                            </div>
+                            <div class="col">
+                                <span th:text="${member.getPostalCode()}"></span>
+                            </div>
+                        </div>
+                        <div class="row pb-2 mb-2 border-bottom">
+                            <div class="col-4">
+                                <span class="fw-bold">住所</span>
+                            </div>
+                            <div class="col">
+                                <span th:text="${member.getAddress()}"></span>
+                            </div>
+                        </div>
+                        <div class="row pb-2 mb-2 border-bottom">
+                            <div class="col-4">
+                                <span class="fw-bold">電話番号</span>
+                            </div>
+                            <div class="col">
+                                <span th:text="${member.getPhoneNumber()}"></span>
+                            </div>
+                        </div>
+                        <div class="row pb-2 mb-2 border-bottom">
+                            <div class="col-4">
+                                <span class="fw-bold">メールアドレス</span>
+                            </div>
+                            <div class="col">
+                                <span th:text="${member.getEmail()}"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row pb-2 mb-2 border-bottom">
+                        <div class="col-4">
+                            <span class="fw-bold">クレジットカード</span>
+                        </div>
+                        <div class="col">
+                            <span th:text="${member.status == T(com.example.nagoyameshi.entity.Member.Status).PAID ? '登録済み' : '未登録'}"></span>
+                        </div>
+                    </div>
+
+                    <!-- 無料会員へのダウングレードリンク -->
+                    <div th:if="${member.status == T(com.example.nagoyameshi.entity.Member.Status).PAID}" class="text-center mt-4">
+                        <a href="javascript:void(0);" class="btn btn-danger" onclick="showDowngradeToast()">無料会員へダウングレードする</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- フッター -->
+    <div th:replace="~{fragment :: footer}"></div>
+</div>
+
+<div th:replace="~{fragment :: scripts}"></div>
+
+<!-- トーストメッセージ用JavaScript -->
+<script>
+    function showDowngradeToast() {
+        if (confirm("クレジットカード情報を削除し無料会員へダウングレードします。よろしいですか？")) {
+            // メタタグからCSRFトークンを取得
+            const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
+
+            // ダウングレード処理のPOSTリクエスト
+            fetch("/member/downgrade/confirm", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': csrfToken // CSRFトークンを追加
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    // ダウングレード成功時に次のトーストを表示
+                    alert("有料会員から無料会員への手続きが完了しました。ログインをし直してください。");
+                    // ログアウトを実行
+                    logoutAndRedirect();
+                } else {
+                    alert("エラーが発生しました。もう一度お試しください。");
+                }
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                alert("エラーが発生しました。もう一度お試しください。");
+            });
+        }
+    }
+
+    function logoutAndRedirect() {
+        // CSRFトークンを取得
+        const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
+
+        // ログアウトリクエストの送信
+        fetch("/logout", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                window.location.href = "/"; // ホーム画面へリダイレクト
+            } else {
+                alert("ログアウトに失敗しました。もう一度お試しください。");
+            }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            alert("ログアウトに失敗しました。もう一度お試しください。");
+        });
+    }
+</script>
+
+</body>
 </html>

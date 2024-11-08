@@ -1,5 +1,9 @@
 package com.example.nagoyameshi.service;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -9,6 +13,7 @@ import com.stripe.exception.StripeException;
 import com.stripe.model.Customer;
 import com.stripe.model.Event;
 import com.stripe.model.EventDataObjectDeserializer;
+import com.stripe.model.PaymentMethod;
 import com.stripe.model.StripeObject;
 import com.stripe.model.Subscription;
 import com.stripe.model.checkout.Session;
@@ -99,5 +104,33 @@ public class StripeService {
     // セッションIDからSessionオブジェクトを取得
     public Session retrieveSession(String sessionId) throws StripeException {
         return Session.retrieve(sessionId); // セッションIDからSessionを取得
+    }
+    
+    // 顧客のクレジットカード情報を削除
+    public void deleteCustomerCard(String customerId) throws StripeException {
+        Customer customer = Customer.retrieve(customerId);
+        
+        // 登録されている全てのカードを削除
+        Map<String, Object> params = new HashMap<>();
+        params.put("object", "card");
+        List<PaymentMethod> paymentMethods = PaymentMethod.list(params).getData();
+
+        for (PaymentMethod pm : paymentMethods) {
+            pm.detach();
+        }
+    }
+
+    // サブスクリプションのキャンセル
+    public void cancelSubscription(String customerId) throws StripeException {
+        // 顧客に関連するサブスクリプションを検索
+        Map<String, Object> params = new HashMap<>();
+        params.put("customer", customerId);
+        List<Subscription> subscriptions = Subscription.list(params).getData();
+
+        // 顧客の全てのサブスクリプションをキャンセル
+        for (Subscription subscription : subscriptions) {
+            Subscription updatedSubscription = subscription.cancel();
+            System.out.println("Subscription canceled: " + updatedSubscription.getId());
+        }
     }
 }

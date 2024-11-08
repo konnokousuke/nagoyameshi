@@ -50,27 +50,7 @@ public class MemberService {
 
         return memberRepository.save(member);
     }
-/*
-    // 有料会員の作成
-    @Transactional
-    public Member create(PaidSignupForm paidSignupForm) {
-        Member member = new Member();
-        Role role = roleRepository.findByName("ROLE_PAID");
 
-        member.setName(paidSignupForm.getName());
-        member.setFurigana(paidSignupForm.getFurigana());
-        member.setPostalCode(paidSignupForm.getPostalCode());
-        member.setAddress(paidSignupForm.getAddress());
-        member.setPhoneNumber(paidSignupForm.getPhoneNumber());
-        member.setEmail(paidSignupForm.getEmail());
-        member.setPassword(passwordEncoder.encode(paidSignupForm.getPassword()));
-        member.setRole(role);
-        member.setEnabled(true);
-        member.setStatus(Member.Status.PAID);  // 有料会員ステータス設定
-
-        return memberRepository.save(member);
-    }
-*/
     @Transactional
     public void update(MemberEditForm memberEditForm) {
         Member member = memberRepository.getReferenceById(memberEditForm.getId());
@@ -149,8 +129,8 @@ public class MemberService {
     public Member findByCustomerId(String customerId) {
         return memberRepository.findByCustomerId(customerId);
     }
-    
- // 有料会員登録完了フラグを設定
+
+    // 有料会員登録完了フラグを設定
     public void setPaidRegistrationFlag(String email, boolean flag) {
         paidRegistrationFlags.put(email, flag);
     }
@@ -170,6 +150,18 @@ public class MemberService {
         if (paidRole != null) {
             member.setRole(paidRole); // 役割を有料会員に設定
             memberRepository.save(member); // データベースに保存して反映
+        }
+    }
+
+    // ダウングレード処理（有料会員から無料会員へ変更）
+    @Transactional
+    public void downgradeToFreeMember(Member member) {
+        Role freeRole = roleRepository.findByName("ROLE_FREE");
+        if (freeRole != null) {
+            member.setRole(freeRole); // ロールを無料会員に変更
+            member.setStatus(Member.Status.FREE); // ステータスを無料会員に設定
+            member.setCustomerId(null); // 顧客IDをクリアしてクレジットカード情報を削除
+            memberRepository.save(member);
         }
     }
 }
